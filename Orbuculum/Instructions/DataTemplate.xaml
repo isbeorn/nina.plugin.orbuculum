@@ -2,8 +2,11 @@
     x:Class="Orbuculum.Instructions.DataTemplate"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behavior="clr-namespace:NINA.WPF.Base.Behaviors;assembly=NINA.WPF.Base"
     xmlns:converter="clr-namespace:NINA.Core.Utility.Converters;assembly=NINA.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:filter="clr-namespace:NINA.Core.Model;assembly=NINA.Core"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:Orbuculum.Instructions"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mini="clr-namespace:NINA.View.Sequencer.MiniSequencer;assembly=NINA.Sequencer"
@@ -11,8 +14,17 @@
     xmlns:ninactrl="clr-namespace:NINACustomControlLibrary;assembly=NINACustomControlLibrary"
     xmlns:ns="clr-namespace:NINA.Core.Locale;assembly=NINA.Core"
     xmlns:rules="clr-namespace:NINA.Core.Utility.ValidationRules;assembly=NINA.Core"
+    xmlns:util="clr-namespace:NINA.Core.Utility;assembly=NINA.Core"
     mc:Ignorable="d">
     <converter:NaNToVisibilityCollapsedConverter x:Key="NaNToVisibilityCollapsedConverter" />
+    <converter:UnitConverter x:Key="UnitConverter" />
+    <converter:FilterWheelFilterConverter x:Key="FilterWheelFilterConverter" />
+    <converter:MinusOneToBaseValueConverter x:Key="MinusOneToBaseValueConverter" />
+    <converter:IntListToTextBlockListConverter x:Key="IntListToTextBlockListConverter" />
+    <converter:InverseCollectionContainsItemsToVisibilityConverter x:Key="InverseCollectionContainsItemsToVisibilityConverter" />
+    <converter:CameraDefaultValueConverter x:Key="CameraDefaultValueConverter" />
+    <converter:MinusOneToEmptyStringConverter x:Key="MinusOneToEmptyStringConverter" />
+    <converter:NullToVisibilityCollapsedConverter x:Key="NullToVisibilityCollapsedConverter" />
 
     <DataTemplate DataType="{x:Type local:LoopWhileNextTargetBelowAltitude}">
         <nina:SequenceBlockView>
@@ -68,12 +80,13 @@
             <nina:SequenceBlockView.SequenceItemContent>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center" Text="{ns:Loc LblOffset}" />
-                    <TextBox
+                    <ninactrl:UnitTextBox
                         MinWidth="40"
                         Margin="5,0,0,0"
                         VerticalAlignment="Center"
-                        TextAlignment="Right">
-                        <TextBox.Text>
+                        TextAlignment="Right"
+                        Unit="°">
+                        <ninactrl:UnitTextBox.Text>
                             <Binding Path="AltitudeOffset">
                                 <Binding.ValidationRules>
                                     <rules:DoubleRangeRule>
@@ -83,8 +96,8 @@
                                     </rules:DoubleRangeRule>
                                 </Binding.ValidationRules>
                             </Binding>
-                        </TextBox.Text>
-                    </TextBox>
+                        </ninactrl:UnitTextBox.Text>
+                    </ninactrl:UnitTextBox>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
             <nina:SequenceBlockView.SequenceItemProgressContent>
@@ -110,5 +123,589 @@
                 </StackPanel>
             </mini:MiniCondition.ConditionProgressContent>
         </mini:MiniCondition>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:LoopWhileNextTargetHourAngle}">
+        <nina:SequenceBlockView>
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Hour Angle" />
+
+                    <ComboBox
+                        Margin="5,0,0,0"
+                        ItemsSource="{Binding ComparisonOperators}"
+                        SelectedValue="{Binding Comparator}" />
+
+                    <ninactrl:UnitTextBox
+                        MinWidth="35"
+                        VerticalAlignment="Center"
+                        Unit="h">
+                        <ninactrl:UnitTextBox.Text>
+                            <Binding Path="NextTargetHourAngle" UpdateSourceTrigger="LostFocus">
+                                <Binding.ValidationRules>
+                                    <rules:DoubleRangeRule>
+                                        <rules:DoubleRangeRule.ValidRange>
+                                            <rules:DoubleRangeChecker Maximum="12" Minimum="-12" />
+                                        </rules:DoubleRangeRule.ValidRange>
+                                    </rules:DoubleRangeRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ninactrl:UnitTextBox.Text>
+                    </ninactrl:UnitTextBox>
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+            <nina:SequenceBlockView.SequenceItemProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetHourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                    <TextBlock Text="{Binding NextTargetName}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentHourAngle}" />
+                    <TextBlock Text="h / " />
+                    <TextBlock Text="{Binding NextTargetHourAngle}" />
+                    <TextBlock Text="h" />
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemProgressContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+    <DataTemplate x:Key="Orbuculum.Instructions.LoopWhileNextTargetHourAngle_Mini">
+        <mini:MiniCondition>
+            <mini:MiniCondition.ConditionProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetHourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                    <TextBlock Text="{Binding NextTargetName}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentHourAngle}" />
+                    <TextBlock Text="h / " />
+                    <TextBlock Text="{Binding NextTargetHourAngle}" />
+                    <TextBlock Text="h" />
+                </StackPanel>
+            </mini:MiniCondition.ConditionProgressContent>
+        </mini:MiniCondition>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:LoopWhileHourAngle}">
+        <nina:SequenceBlockView>
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Hour Angle" />
+
+                    <ComboBox
+                        Margin="5,0,0,0"
+                        ItemsSource="{Binding ComparisonOperators}"
+                        SelectedValue="{Binding Comparator}" />
+
+                    <ninactrl:UnitTextBox
+                        MinWidth="35"
+                        VerticalAlignment="Center"
+                        Unit="h">
+                        <ninactrl:UnitTextBox.Text>
+                            <Binding Path="HourAngle" UpdateSourceTrigger="LostFocus">
+                                <Binding.ValidationRules>
+                                    <rules:DoubleRangeRule>
+                                        <rules:DoubleRangeRule.ValidRange>
+                                            <rules:DoubleRangeChecker Maximum="12" Minimum="-12" />
+                                        </rules:DoubleRangeRule.ValidRange>
+                                    </rules:DoubleRangeRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ninactrl:UnitTextBox.Text>
+                    </ninactrl:UnitTextBox>
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+            <nina:SequenceBlockView.SequenceItemProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding HourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle}" />
+                    <TextBlock Text="h / " />
+                    <TextBlock Text="{Binding HourAngle}" />
+                    <TextBlock Text="h" />
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemProgressContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+    <DataTemplate x:Key="Orbuculum.Instructions.LoopWhileHourAngle_Mini">
+        <mini:MiniCondition>
+            <mini:MiniCondition.ConditionProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding HourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle}" />
+                    <TextBlock Text="h / " />
+                    <TextBlock Text="{Binding HourAngle}" />
+                    <TextBlock Text="h" />
+                </StackPanel>
+            </mini:MiniCondition.ConditionProgressContent>
+        </mini:MiniCondition>
+    </DataTemplate>
+
+
+    <DataTemplate DataType="{x:Type local:AutoBalancingExposure}">
+        <nina:SequenceBlockView>
+            <nina:SequenceBlockView.SequenceItemContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontStyle="Italic"
+                            Text="Each time this instruction runs an exposure is taken for a specified filter and time by picking the best fitting details from the table below"
+                            TextWrapping="Wrap" />
+                        <Button
+                            Grid.Column="1"
+                            Width="25"
+                            Height="25"
+                            Margin="5,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Command="{Binding AddRowCommand}"
+                            Style="{StaticResource BackgroundButton}">
+                            <Grid>
+                                <Path
+                                    Margin="5"
+                                    Data="{StaticResource AddSVG}"
+                                    Fill="{StaticResource PrimaryBrush}"
+                                    Stretch="Uniform" />
+                            </Grid>
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Foreground="{StaticResource PrimaryBrush}" Text="Add a new exposure definition row" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                        </Button>
+                    </Grid>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        HeadersVisibility="Column"
+                        HorizontalScrollBarVisibility="Disabled"
+                        ItemsSource="{Binding ExposureItems}"
+                        SelectionMode="Single"
+                        VerticalScrollBarVisibility="Disabled">
+                        <i:Interaction.Behaviors>
+                            <behavior:BubbleScrollEvent />
+                        </i:Interaction.Behaviors>
+                        <DataGrid.Resources>
+                            <util:BindingProxy x:Key="CameraInfo" Data="{Binding CameraInfo}" />
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblProgress}">
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ninactrl:IntStepperControl
+                                            Margin="5,0,5,0"
+                                            HorizontalAlignment="Stretch"
+                                            AddSVG="{StaticResource AddSVG}"
+                                            MinValue="0"
+                                            StepSize="1"
+                                            SubstractSVG="{StaticResource SubstractSVG}"
+                                            Value="{Binding Progress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Progress}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="Ratio">
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ninactrl:StepperControl
+                                            Margin="5,0,5,0"
+                                            HorizontalAlignment="Stretch"
+                                            AddSVG="{StaticResource AddSVG}"
+                                            MinValue="0"
+                                            StepSize="1"
+                                            SubstractSVG="{StaticResource SubstractSVG}"
+                                            Value="{Binding Ratio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Ratio, Converter={StaticResource UnitConverter}, ConverterParameter='x'}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblTime}">
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ninactrl:StepperControl
+                                            Margin="5,0,5,0"
+                                            HorizontalAlignment="Stretch"
+                                            AddSVG="{StaticResource AddSVG}"
+                                            MinValue="0"
+                                            StepSize="1"
+                                            SubstractSVG="{StaticResource SubstractSVG}"
+                                            Value="{Binding ExposureTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding ExposureTime, Converter={StaticResource UnitConverter}, ConverterParameter=' s'}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblFilter}">
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+
+                                        <ComboBox
+                                            Margin="5,0,0,0"
+                                            DisplayMemberPath="Name"
+                                            SelectedItem="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FilterWheelFilterConverter}}"
+                                            SelectedValuePath="Name">
+                                            <ComboBox.Resources>
+                                                <CollectionViewSource x:Key="Filters" Source="{Binding Source={StaticResource ProfileService}, Path=ActiveProfile.FilterWheelSettings.FilterWheelFilters}" />
+                                            </ComboBox.Resources>
+                                            <ComboBox.ItemsSource>
+                                                <CompositeCollection>
+                                                    <x:Static Member="filter:NullFilter.Instance" />
+                                                    <CollectionContainer Collection="{Binding Source={StaticResource Filters}}" />
+                                                </CompositeCollection>
+                                            </ComboBox.ItemsSource>
+                                        </ComboBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Filter}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblBinning}">
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+
+                                        <ComboBox
+                                            Margin="5,0,0,0"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding Source={StaticResource CameraInfo}, Path=Data.BinningModes, Converter={StaticResource DefaultBinningModesConverter}}"
+                                            SelectedItem="{Binding Binning, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            SelectedValuePath="Name" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Binning.Name}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!--  List of Gain  -->
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblGain}">
+                                <DataGridTemplateColumn.Visibility>
+                                    <PriorityBinding>
+                                        <Binding
+                                            Converter="{StaticResource CollectionContainsItemsToVisibilityConverter}"
+                                            Path="Data.Gains"
+                                            Source="{StaticResource CameraInfo}" />
+                                        <Binding
+                                            Converter="{StaticResource BooleanToVisibilityCollapsedConverter}"
+                                            Path="Data.Connected"
+                                            Source="{StaticResource CameraInfo}" />
+                                    </PriorityBinding>
+                                </DataGridTemplateColumn.Visibility>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            Margin="5,0,0,0"
+                                            DisplayMemberPath="Text"
+                                            IsSynchronizedWithCurrentItem="True"
+                                            SelectedValuePath="Text">
+                                            <ComboBox.ItemsSource>
+                                                <CompositeCollection>
+                                                    <TextBlock Text="{Binding Source={StaticResource CameraInfo}, Path=Data.DefaultGain, UpdateSourceTrigger=PropertyChanged, StringFormat=({0})}" />
+                                                    <CollectionContainer Collection="{Binding Source={StaticResource CameraInfo}, Path=Data.Gains, Converter={StaticResource IntListToTextBlockListConverter}}" />
+                                                </CompositeCollection>
+                                            </ComboBox.ItemsSource>
+                                            <ComboBox.SelectedValue>
+                                                <MultiBinding
+                                                    Converter="{StaticResource MinusOneToBaseValueConverter}"
+                                                    Mode="TwoWay"
+                                                    UpdateSourceTrigger="PropertyChanged">
+                                                    <Binding
+                                                        Mode="TwoWay"
+                                                        Path="Gain"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                    <Binding
+                                                        Mode="OneWay"
+                                                        Path="Data.DefaultGain"
+                                                        Source="{StaticResource CameraInfo}"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                </MultiBinding>
+                                            </ComboBox.SelectedValue>
+                                        </ComboBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
+                                            TextAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource MinusOneToBaseValueConverter}" UpdateSourceTrigger="LostFocus">
+                                                    <Binding
+                                                        Mode="TwoWay"
+                                                        Path="Gain"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                    <Binding
+                                                        Mode="OneWay"
+                                                        Path="Data.DefaultGain"
+                                                        Source="{StaticResource CameraInfo}"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!--  Free Gain  -->
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblGain}">
+                                <DataGridTemplateColumn.Visibility>
+                                    <PriorityBinding>
+                                        <Binding
+                                            Converter="{StaticResource InverseCollectionContainsItemsToVisibilityConverter}"
+                                            Path="Data.Gains"
+                                            Source="{StaticResource CameraInfo}" />
+                                    </PriorityBinding>
+                                </DataGridTemplateColumn.Visibility>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ninactrl:HintTextBox
+                                            MinWidth="40"
+                                            Margin="5,0,0,0"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Right"
+                                            VerticalContentAlignment="Center"
+                                            Foreground="{StaticResource PrimaryBrush}"
+                                            TextAlignment="Right">
+                                            <ninactrl:HintTextBox.HintText>
+                                                <Binding
+                                                    Converter="{StaticResource CameraDefaultValueConverter}"
+                                                    Mode="OneWay"
+                                                    Path="Data.DefaultGain"
+                                                    Source="{StaticResource CameraInfo}"
+                                                    UpdateSourceTrigger="PropertyChanged" />
+                                            </ninactrl:HintTextBox.HintText>
+                                            <ninactrl:HintTextBox.Text>
+                                                <Binding
+                                                    Converter="{StaticResource MinusOneToEmptyStringConverter}"
+                                                    Mode="TwoWay"
+                                                    Path="Gain"
+                                                    UpdateSourceTrigger="LostFocus">
+                                                    <Binding.ValidationRules>
+                                                        <util:ShortRangeRule>
+                                                            <util:ShortRangeRule.ValidRange>
+                                                                <util:ShortRangeChecker Maximum="32767" Minimum="-1" />
+                                                            </util:ShortRangeRule.ValidRange>
+                                                        </util:ShortRangeRule>
+                                                    </Binding.ValidationRules>
+                                                </Binding>
+                                            </ninactrl:HintTextBox.Text>
+                                        </ninactrl:HintTextBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            TextAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource MinusOneToBaseValueConverter}" UpdateSourceTrigger="LostFocus">
+                                                    <Binding
+                                                        Mode="TwoWay"
+                                                        Path="Gain"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                    <Binding
+                                                        Mode="OneWay"
+                                                        Path="Data.DefaultGain"
+                                                        Source="{StaticResource CameraInfo}"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="*"
+                                CanUserSort="False"
+                                Header="{ns:Loc LblOffset}">
+                                <DataGridTemplateColumn.Visibility>
+                                    <MultiBinding Converter="{StaticResource BooleanOrToVisibilityCollapsedMultiConverter}" FallbackValue="Visible">
+                                        <Binding
+                                            Converter="{StaticResource InverseBooleanConverter}"
+                                            Path="Data.Connected"
+                                            Source="{StaticResource CameraInfo}" />
+                                        <Binding Path="Data.CanSetOffset" Source="{StaticResource CameraInfo}" />
+                                    </MultiBinding>
+                                </DataGridTemplateColumn.Visibility>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ninactrl:HintTextBox
+                                            MinWidth="40"
+                                            Margin="5,0,0,0"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Right"
+                                            VerticalContentAlignment="Center"
+                                            Foreground="{StaticResource PrimaryBrush}"
+                                            TextAlignment="Right">
+                                            <ninactrl:HintTextBox.HintText>
+                                                <Binding
+                                                    Converter="{StaticResource CameraDefaultValueConverter}"
+                                                    Mode="OneWay"
+                                                    Path="Data.DefaultOffset"
+                                                    Source="{StaticResource CameraInfo}"
+                                                    UpdateSourceTrigger="PropertyChanged" />
+                                            </ninactrl:HintTextBox.HintText>
+                                            <ninactrl:HintTextBox.Text>
+                                                <Binding
+                                                    Converter="{StaticResource MinusOneToEmptyStringConverter}"
+                                                    Mode="TwoWay"
+                                                    Path="Offset"
+                                                    UpdateSourceTrigger="LostFocus">
+                                                    <Binding.ValidationRules>
+                                                        <util:ShortRangeRule>
+                                                            <util:ShortRangeRule.ValidRange>
+                                                                <util:ShortRangeChecker Maximum="32767" Minimum="-1" />
+                                                            </util:ShortRangeRule.ValidRange>
+                                                        </util:ShortRangeRule>
+                                                    </Binding.ValidationRules>
+                                                </Binding>
+                                            </ninactrl:HintTextBox.Text>
+                                        </ninactrl:HintTextBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="5,0,5,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            TextAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource MinusOneToBaseValueConverter}" UpdateSourceTrigger="LostFocus">
+                                                    <Binding
+                                                        Mode="TwoWay"
+                                                        Path="Offset"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                    <Binding
+                                                        Mode="OneWay"
+                                                        Path="Data.DefaultOffset"
+                                                        Source="{StaticResource CameraInfo}"
+                                                        UpdateSourceTrigger="PropertyChanged" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="30"
+                                CanUserSort="False"
+                                Header="">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Width="25"
+                                            Height="25"
+                                            Margin="5,0,5,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding DataContext.DeleteRowCommand, RelativeSource={RelativeSource AncestorType={x:Type nina:SequenceBlockView}}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource BackgroundButton}">
+                                            <Grid>
+                                                <Path
+                                                    Margin="5"
+                                                    Data="{StaticResource TrashCanSVG}"
+                                                    Fill="{StaticResource PrimaryBrush}"
+                                                    Stretch="Uniform" />
+                                            </Grid>
+                                            <Button.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Foreground="{StaticResource PrimaryBrush}" Text="Add a new exposure definition row" />
+                                                </ToolTip>
+                                            </Button.ToolTip>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+                </Grid>
+            </nina:SequenceBlockView.SequenceItemContent>
+            <nina:SequenceBlockView.SequenceItemProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding CurrentExposureItem, Converter={StaticResource NullToVisibilityCollapsedConverter}}">
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding CurrentExposureItem.Filter, Converter={StaticResource NullToVisibilityCollapsedConverter}}">
+                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentExposureItem.Filter.Name}" />
+                        <TextBlock Text=" - " />
+                    </StackPanel>
+                    <TextBlock Text="{Binding CurrentExposureItem.ExposureTime}" />
+                    <TextBlock Text="s" />
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemProgressContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+    <DataTemplate x:Key="Orbuculum.Instructions.AutoBalancingExposure_Mini">
+
+        <mini:MiniSequenceItem>
+            <mini:MiniSequenceItem.SequenceItemProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding CurrentExposureItem, Converter={StaticResource NullToVisibilityCollapsedConverter}}">
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding CurrentExposureItem.Filter, Converter={StaticResource NullToVisibilityCollapsedConverter}}">
+                        <TextBlock VerticalAlignment="Center" Text="{Binding CurrentExposureItem.Filter.Name}" />
+                        <TextBlock Text=" - " />
+                    </StackPanel>
+                    <TextBlock Text="{Binding CurrentExposureItem.ExposureTime}" />
+                    <TextBlock Text="s" />
+                </StackPanel>
+            </mini:MiniSequenceItem.SequenceItemProgressContent>
+        </mini:MiniSequenceItem>
     </DataTemplate>
 </ResourceDictionary>

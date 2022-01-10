@@ -80,6 +80,7 @@ namespace Orbuculum.Instructions {
 
         private LoopWhileNextTargetBelowHorizon(LoopWhileNextTargetBelowHorizon copyMe) : this(copyMe.profileService) { 
             CopyMetaData(copyMe);
+            NextTargetAltitude = copyMe.NextTargetAltitude;
             AltitudeOffset = copyMe.AltitudeOffset;
         }
 
@@ -135,6 +136,9 @@ namespace Orbuculum.Instructions {
 
         public override bool Check(ISequenceItem previousItem, ISequenceItem nextItem) {
             return NextTargetCurrentAltitude < NextTargetAltitude;
+        }
+        public override string ToString() {
+            return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowHorizon)}, Next Target Horizon {NextTargetCurrentAltitude}, Next Target Current Hour Angle {NextTargetAltitude}";
         }
     }
 }

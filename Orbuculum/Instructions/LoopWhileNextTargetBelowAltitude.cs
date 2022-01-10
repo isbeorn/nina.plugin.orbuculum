@@ -70,7 +70,8 @@ namespace Orbuculum.Instructions {
         }
 
         private LoopWhileNextTargetBelowAltitude(LoopWhileNextTargetBelowAltitude copyMe) : this(copyMe.profileService) { 
-            CopyMetaData(copyMe); 
+            CopyMetaData(copyMe);
+            NextTargetAltitude = copyMe.NextTargetAltitude;
         }
 
         public override object Clone() {
@@ -114,6 +115,9 @@ namespace Orbuculum.Instructions {
 
         public override bool Check(ISequenceItem previousItem, ISequenceItem nextItem) {
             return NextTargetCurrentAltitude < NextTargetAltitude;
+        }
+        public override string ToString() {
+            return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowAltitude)}, Next Target Altitude {NextTargetCurrentAltitude}, Next Target Current Altitude {NextTargetAltitude}";
         }
 
 

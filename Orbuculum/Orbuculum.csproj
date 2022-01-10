@@ -265,11 +265,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Instructions\AutoBalancingExposure.cs" />
     <Compile Include="Instructions\DataTemplate.xaml.cs">
       <DependentUpon>DataTemplate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Instructions\LinqExtension.cs" />
+    <Compile Include="Instructions\LoopWhileHourAngle.cs" />
     <Compile Include="Instructions\LoopWhileNextTargetBelowHorizon.cs" />
     <Compile Include="Instructions\LoopWhileNextTargetBelowAltitude.cs" />
+    <Compile Include="Instructions\LoopWhileNextTargetHourAngle.cs" />
     <Compile Include="Instructions\Scry.cs" />
     <Compile Include="Options.xaml.cs">
       <DependentUpon>Options.xaml</DependentUpon>
