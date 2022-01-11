@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -35,7 +33,6 @@ namespace Orbuculum.Instructions {
     [Export(typeof(ISequenceContainer))]
     [JsonObject(MemberSerialization.OptIn)]
     public class AutoBalancingExposure : SequentialContainer, IImmutableContainer, IValidatable {
-
         private IProfileService profileService;
         private ICameraMediator cameraMediator;
         private IImagingMediator imagingMediator;
@@ -87,10 +84,10 @@ namespace Orbuculum.Instructions {
             var balanced = new AutoBalancingExposure(this) {
             };
 
-            foreach(var entry in this.ExposureItems) {
+            foreach (var entry in this.ExposureItems) {
                 balanced.ExposureItems.Add(entry.Clone());
             }
-            if(balanced.ExposureItems.Count == 0) {
+            if (balanced.ExposureItems.Count == 0) {
             }
             return balanced;
         }
@@ -106,6 +103,7 @@ namespace Orbuculum.Instructions {
         }
 
         private ExposureItem currentExposureItem;
+
         public ExposureItem CurrentExposureItem {
             get => currentExposureItem;
             set {
@@ -115,42 +113,51 @@ namespace Orbuculum.Instructions {
         }
 
         public override async Task Execute(IProgress<ApplicationStatus> progress, CancellationToken token) {
-            this.Items.Clear();
+            try {
+                this.Items.Clear();
 
-            ExposureItem item = GetNextExposureItem();
-            CurrentExposureItem = item;
+                ExposureItem item = GetNextExposureItem();
+                CurrentExposureItem = item;
 
-            var switchFilter = new SwitchFilter(profileService, filterWheelMediator);
-            switchFilter.ErrorBehavior = this.ErrorBehavior;
-            switchFilter.Attempts = this.Attempts;
-            switchFilter.Filter = item.Filter;
+                var switchFilter = new SwitchFilter(profileService, filterWheelMediator);
+                switchFilter.ErrorBehavior = this.ErrorBehavior;
+                switchFilter.Attempts = this.Attempts;
+                switchFilter.Filter = item.Filter;
+                switchFilter.AttachNewParent(this);
 
-            var exposure = new TakeExposure(profileService, cameraMediator, imagingMediator, imageSaveMediator, imageHistoryVM);
-            exposure.ErrorBehavior = this.ErrorBehavior;
-            exposure.Attempts = this.Attempts;
-            // Fill in exposure details
-            exposure.ImageType = CaptureSequence.ImageTypes.LIGHT;
-            exposure.ExposureCount = item.Progress;
-            exposure.ExposureTime = item.ExposureTime;
-            exposure.Binning = item.Binning;
-            exposure.Gain = item.Gain;
-            exposure.Offset = item.Offset;
+                var exposure = new TakeExposure(profileService, cameraMediator, imagingMediator, imageSaveMediator, imageHistoryVM);
+                exposure.ErrorBehavior = this.ErrorBehavior;
+                exposure.Attempts = this.Attempts;
+                // Fill in exposure details
+                exposure.ImageType = CaptureSequence.ImageTypes.LIGHT;
+                exposure.ExposureCount = item.Progress;
+                exposure.ExposureTime = item.ExposureTime;
+                exposure.Binning = item.Binning;
+                exposure.Gain = item.Gain;
+                exposure.Offset = item.Offset;
+                exposure.AttachNewParent(this);
 
-            this.Items.Add(switchFilter);
-            this.Items.Add(exposure);
-            await base.Execute(progress, token);
+                this.Items.Add(switchFilter);
+                this.Items.Add(exposure);
+                await base.Execute(progress, token);
 
-            // Increment progress after successful capture
-            if(exposure.Status == NINA.Core.Enum.SequenceEntityStatus.FINISHED) { 
-                item.Progress = exposure.ExposureCount;
+                // Increment progress after successful capture
+                if (exposure.Status == NINA.Core.Enum.SequenceEntityStatus.FINISHED) {
+                    item.Progress = exposure.ExposureCount;
+                }
+                CurrentExposureItem = null;
+            } finally {
+                foreach (var seq in Items) {
+                    seq.AttachNewParent(null);
+                }
+                this.Items.Clear();
             }
-            CurrentExposureItem = null;
         }
 
         private ExposureItem GetNextExposureItem() {
             return ExposureItems.MinBy(x => (double)x.Progress / x.Ratio);
         }
-        
+
         [JsonProperty]
         public AsyncObservableCollection<ExposureItem> ExposureItems {
             get => exposureItems;
@@ -164,9 +171,9 @@ namespace Orbuculum.Instructions {
             var i = new ObservableCollection<string>();
             CameraInfo = this.cameraMediator.GetInfo();
 
-            if(ExposureItems.Count == 0) {
+            if (ExposureItems.Count == 0) {
                 i.Add("At least one exposure definition has to be added");
-            } else { 
+            } else {
                 var nextItem = GetNextExposureItem();
 
                 if (!CameraInfo.Connected) {
@@ -216,7 +223,7 @@ namespace Orbuculum.Instructions {
         private int offset;
         private BinningMode binning;
         private int ratio;
-        private int progress;        
+        private int progress;
 
         public ExposureItem() {
             Gain = -1;
@@ -224,7 +231,6 @@ namespace Orbuculum.Instructions {
             Binning = new BinningMode(1, 1);
             Ratio = 1;
         }
-
 
         [JsonProperty]
         public FilterInfo Filter {

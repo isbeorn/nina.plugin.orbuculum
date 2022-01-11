@@ -322,11 +322,11 @@
                                 Header="Ratio">
                                 <DataGridTemplateColumn.CellEditingTemplate>
                                     <DataTemplate>
-                                        <ninactrl:StepperControl
+                                        <ninactrl:IntStepperControl
                                             Margin="5,0,5,0"
                                             HorizontalAlignment="Stretch"
                                             AddSVG="{StaticResource AddSVG}"
-                                            MinValue="0"
+                                            MinValue="1"
                                             StepSize="1"
                                             SubstractSVG="{StaticResource SubstractSVG}"
                                             Value="{Binding Ratio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
