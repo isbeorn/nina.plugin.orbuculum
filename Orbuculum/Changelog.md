@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.3.2
+- `🧙 Auto Balancing Exposure` was not working correctly with GroundStation Failure Trigger. Added a workaround to make Groundstation not fail with the instruction.
+
 ## Version 1.0.3.1
 - Fixed an issue where the `🧙 Auto Balancing Exposure` was not populating the target name
 - Changed the stepper to not show decimal places for the ratio

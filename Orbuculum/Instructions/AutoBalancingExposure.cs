@@ -120,6 +120,9 @@ namespace Orbuculum.Instructions {
                 CurrentExposureItem = item;
 
                 var switchFilter = new SwitchFilter(profileService, filterWheelMediator);
+                switchFilter.Name = nameof(SwitchFilter);
+                switchFilter.Category = "Orbuculum";
+                switchFilter.Description = "";
                 switchFilter.ErrorBehavior = this.ErrorBehavior;
                 switchFilter.Attempts = this.Attempts;
                 switchFilter.Filter = item.Filter;
@@ -129,6 +132,9 @@ namespace Orbuculum.Instructions {
                 exposure.ErrorBehavior = this.ErrorBehavior;
                 exposure.Attempts = this.Attempts;
                 // Fill in exposure details
+                exposure.Name = nameof(TakeExposure);
+                exposure.Category = "Orbuculum";
+                exposure.Description = "";
                 exposure.ImageType = CaptureSequence.ImageTypes.LIGHT;
                 exposure.ExposureCount = item.Progress;
                 exposure.ExposureTime = item.ExposureTime;
