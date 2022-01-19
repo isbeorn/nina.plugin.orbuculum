@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -161,7 +162,7 @@ namespace Orbuculum.Instructions {
         }
 
         private ExposureItem GetNextExposureItem() {
-            return ExposureItems.MinBy(x => (double)x.Progress / x.Ratio);
+            return ExposureItems.Where(x => x.Ratio > 0).MinBy(x => (double)x.Progress / x.Ratio);
         }
 
         [JsonProperty]
@@ -177,8 +178,8 @@ namespace Orbuculum.Instructions {
             var i = new ObservableCollection<string>();
             CameraInfo = this.cameraMediator.GetInfo();
 
-            if (ExposureItems.Count == 0) {
-                i.Add("At least one exposure definition has to be added");
+            if (ExposureItems.Where(x => x.Ratio > 0).Count() == 0) {
+                i.Add("At least one exposure definition has to be added with a ratio greater than 0");
             } else {
                 var nextItem = GetNextExposureItem();
 

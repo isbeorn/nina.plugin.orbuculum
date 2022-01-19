@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## Version 1.0.3.3
+- Added more descriptions about available instructions
+- Allow for a ratio of 0 for `🧙 Auto Balancing Exposure` to disable a row temporarily
+
 ## Version 1.0.3.2
 - `🧙 Auto Balancing Exposure` was not working correctly with GroundStation Failure Trigger. Added a workaround to make Groundstation not fail with the instruction.
 

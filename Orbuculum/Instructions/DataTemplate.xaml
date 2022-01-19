@@ -326,7 +326,7 @@
                                             Margin="5,0,5,0"
                                             HorizontalAlignment="Stretch"
                                             AddSVG="{StaticResource AddSVG}"
-                                            MinValue="1"
+                                            MinValue="0"
                                             StepSize="1"
                                             SubstractSVG="{StaticResource SubstractSVG}"
                                             Value="{Binding Ratio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

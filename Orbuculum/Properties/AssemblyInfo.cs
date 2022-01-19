@@ -34,11 +34,11 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.3.2")]
-[assembly: AssemblyFileVersion("1.0.3.2")]
+[assembly: AssemblyVersion("1.0.3.3")]
+[assembly: AssemblyFileVersion("1.0.3.3")]
 
 //The minimum Version of N.I.N.A. that this plugin is compatible with
-[assembly: AssemblyMetadata("MinimumApplicationVersion", "2.0.0.2020")]
+[assembly: AssemblyMetadata("MinimumApplicationVersion", "2.0.0.2031")]
 
 //Your plugin homepage - omit if not applicaple
 [assembly: AssemblyMetadata("Homepage", "https://www.patreon.com/stefanberg/")]
@@ -62,4 +62,23 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("AltScreenshotURL", "")]
 [assembly: AssemblyMetadata("LongDescription", @"This plugin is intended to provide some basic tools to improve multi target planning by scrying future targets and predicting their state to react on these.  
 
-For example - you know that a target is obstructed until it reaches a certain altitude, so you want to loop another target for as long as that target is below that specific altitude.")]
+For example - you know that a target is obstructed until it reaches a certain altitude, so you want to loop another target for as long as that target is below that specific altitude.
+
+## Loop Conditions
++ Loop While Hour Angle
+    + Loop the current target until a certain hour angle is reached
++ Loop While Next Target Hour Angle
+    + Loop the current target until a certain hour angle for the next target is reached
++ Loop While Next Target Below Altitude
+    + Loop the current target until the next target rises above a specified altitude
++ Loop While Next Target Below Horizon
+    + Loop the current target until the next target rises above the horizon
+
+## Instructions
++ Auto Balancing Exposure
+    + An imaging instruction that will automatically balance the exposures by the given exposure definitions
+    + This is useful if you want to have a specific ratio between filters for example
+    + To add a new exposure definition hit the '+' button above the table
+    + Put the instruction inside a loop and it will automatically pick a fitting exposure definition each time it is executed
+    + The exposure is picked by simply finding the minimum detail by (Progress / Ratio)
+    + A ratio of 0 will deactivate the row")]
