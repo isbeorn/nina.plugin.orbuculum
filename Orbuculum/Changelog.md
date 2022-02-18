@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.3.4
+- Properly consider disable status for orbuculum condition loops
+
 ## Version 1.0.3.3
 - Added more descriptions about available instructions
 - Allow for a ratio of 0 for `🧙 Auto Balancing Exposure` to disable a row temporarily

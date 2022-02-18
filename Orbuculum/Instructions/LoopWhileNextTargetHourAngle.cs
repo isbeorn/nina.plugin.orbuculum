@@ -44,7 +44,7 @@ namespace Orbuculum.Instructions {
         private async Task InterruptWhenTargetBelowAltitude() {
             if (!Check(null, null)) {
                 if (this.Parent != null) {
-                    if (ItemUtility.IsInRootContainer(Parent) && this.Parent.Status == SequenceEntityStatus.RUNNING) {
+                    if (ItemUtility.IsInRootContainer(Parent) && this.Parent.Status == SequenceEntityStatus.RUNNING && this.Status != SequenceEntityStatus.DISABLED) {
                         Logger.Info("Next Target is above hour angle - Interrupting current Instruction Set");
                         await this.Parent.Interrupt();
                     }
