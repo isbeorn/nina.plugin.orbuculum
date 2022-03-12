@@ -61,15 +61,19 @@ namespace Orbuculum.Instructions {
             if (this.Parent == null) {
                 i.Add("🚫 The condition has to be inside an instruction set.");
             } else {
-                var nextTarget = Scry.NextTarget(this.Parent);
-                if(nextTarget == null) {
-                    Data.SetCoordinates(null);
-                    Data.CurrentAltitude = double.NaN;
-                    NextTargetName = string.Empty;
-                    i.Add("🚫 Scrying failed. No future target found");
-                } else {
-                    Data.SetCoordinates(nextTarget.Target.InputCoordinates);
-                    NextTargetName = nextTarget.Target.TargetName;
+                if (Parent.Status == SequenceEntityStatus.CREATED || Parent.Status == SequenceEntityStatus.RUNNING) {
+                    var nextTarget = Scry.NextTarget(this.Parent);
+                    if (nextTarget == null) {
+                        Data.SetCoordinates(null);
+                        Data.CurrentAltitude = double.NaN;
+                        NextTargetName = string.Empty;
+                        i.Add("🚫 Scrying failed. No future target found");
+                    } else {
+                        if (Data.Coordinates != nextTarget.Target.InputCoordinates) {
+                            Data.SetCoordinates(nextTarget.Target.InputCoordinates);
+                            NextTargetName = nextTarget.Target.TargetName;
+                        }
+                    }
                 }
             }
 
@@ -87,7 +91,7 @@ namespace Orbuculum.Instructions {
 
         public double GetCurrentAltitude(DateTime time, ObserverInfo observer) {
             if (Data.Coordinates == null) return double.NaN;
-
+            
             TopocentricCoordinates altaz = Data.Coordinates.Coordinates.Transform(Angle.ByDegree(observer.Latitude), Angle.ByDegree(observer.Longitude), time);
             return altaz.Altitude.Degree;
         }

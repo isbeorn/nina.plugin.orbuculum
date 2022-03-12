@@ -97,14 +97,16 @@ namespace Orbuculum.Instructions {
             if (this.Parent == null) {
                 i.Add("🚫 The condition has to be inside an instruction set.");
             } else {
-                var nextTarget = Scry.NextTarget(this.Parent);
-                if (nextTarget == null) {
-                    NextTargetCurrentHourAngle = double.NaN;
-                    NextTargetName = string.Empty;
-                    i.Add("🚫 Scrying failed. No future target found");
-                } else {
-                    NextTargetCurrentHourAngle = CalculateHourAngle(nextTarget);
-                    NextTargetName = nextTarget.Target.TargetName;
+                if (Parent.Status == SequenceEntityStatus.CREATED || Parent.Status == SequenceEntityStatus.RUNNING) {
+                    var nextTarget = Scry.NextTarget(this.Parent);
+                    if (nextTarget == null) {
+                        NextTargetCurrentHourAngle = double.NaN;
+                        NextTargetName = string.Empty;
+                        i.Add("🚫 Scrying failed. No future target found");
+                    } else {
+                        NextTargetCurrentHourAngle = CalculateHourAngle(nextTarget);
+                        NextTargetName = nextTarget.Target.TargetName;
+                    }
                 }
             }
 
