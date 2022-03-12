@@ -81,6 +81,8 @@ namespace Orbuculum.Instructions {
         }
 
         public double GetCurrentAltitude(DateTime time, ObserverInfo observer) {
+            if (Data.Coordinates == null) return double.NaN;
+
             observer.Longitude = profileService.ActiveProfile.AstrometrySettings.Longitude;
             observer.Latitude = profileService.ActiveProfile.AstrometrySettings.Latitude;
             
@@ -95,6 +97,8 @@ namespace Orbuculum.Instructions {
         }
 
         public override void CalculateExpectedTime() {
+            if (Data.Coordinates == null) return;
+
             Data.CurrentAltitude = GetCurrentAltitude(DateTime.Now, Data.Observer);
             ItemUtility.CalculateExpectedTimeCommon(Data, 0, until: true, 30, GetCurrentAltitude);
         }

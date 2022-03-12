@@ -79,11 +79,15 @@ namespace Orbuculum.Instructions {
 
 
         public override void CalculateExpectedTime() {
+            if (Data.Coordinates == null) return;
+
             Data.CurrentAltitude = GetCurrentAltitude(DateTime.Now, Data.Observer);
             ItemUtility.CalculateExpectedTimeCommon(Data, offset: 0, until: false, 90, GetCurrentAltitude);
         }
 
         public double GetCurrentAltitude(DateTime time, ObserverInfo observer) {
+            if (Data.Coordinates == null) return double.NaN;
+
             TopocentricCoordinates altaz = Data.Coordinates.Coordinates.Transform(Angle.ByDegree(observer.Latitude), Angle.ByDegree(observer.Longitude), time);
             return altaz.Altitude.Degree;
         }
