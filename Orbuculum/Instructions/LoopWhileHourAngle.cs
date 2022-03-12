@@ -96,12 +96,12 @@ namespace Orbuculum.Instructions {
                 i.Add("🚫 The condition has to be inside an instruction set.");
             } else {
                 var target = ItemUtility.RetrieveContextCoordinates(this.Parent);
-                if (target.Item1 == null) {
+                if (target.Coordinates == null) {
                     CurrentHourAngle = double.NaN;
 
                     i.Add("🚫 Must be placed into a Deep Sky Object Instruction Set");
                 } else {
-                    CurrentHourAngle = CalculateHourAngle(target.Item1);
+                    CurrentHourAngle = CalculateHourAngle(target.Coordinates);
                 }
             }
 

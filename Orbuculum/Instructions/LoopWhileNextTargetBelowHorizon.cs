@@ -7,6 +7,7 @@ using NINA.Profile.Interfaces;
 using NINA.Sequencer.Conditions;
 using NINA.Sequencer.Container;
 using NINA.Sequencer.SequenceItem;
+using NINA.Sequencer.SequenceItem.Utility;
 using NINA.Sequencer.Utility;
 using NINA.Sequencer.Validations;
 using System;
@@ -25,67 +26,34 @@ namespace Orbuculum.Instructions {
     [ExportMetadata("Category", "Orbuculum")]
     [Export(typeof(ISequenceCondition))]
     [JsonObject(MemberSerialization.OptIn)]
-    public class LoopWhileNextTargetBelowHorizon : SequenceCondition, IValidatable {
-        private IList<string> issues = new List<string>();
+    public class LoopWhileNextTargetBelowHorizon : LoopForAltitudeBase, IValidatable {
         private string nextTargetName;
-        private double nextTargetAltitude;
-        private double nextTargetCurrentAltitude;
         private IProfileService profileService;
-        private double altitudeOffset;
 
-        public IList<string> Issues { get => issues; set { issues = value; RaisePropertyChanged(); } }
 
         [ImportingConstructor]
-        public LoopWhileNextTargetBelowHorizon(IProfileService profileService) {
-            altitudeOffset = 0;
+        public LoopWhileNextTargetBelowHorizon(IProfileService profileService) : base(profileService, true) {
             this.profileService = profileService;
-            ConditionWatchdog = new ConditionWatchdog(InterruptWhenTargetBelowAltitude, TimeSpan.FromSeconds(5));
+            Data.Offset = 0;
+            Data.Comparator = ComparisonOperatorEnum.LESS_THAN;
 
         }
-
-        [JsonProperty]
-        public double AltitudeOffset {
-            get => altitudeOffset;
-            set {
-                altitudeOffset = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private async Task InterruptWhenTargetBelowAltitude() {
-            if (!Check(null, null)) {
-                if (this.Parent != null) {
-                    if (ItemUtility.IsInRootContainer(Parent) && this.Parent.Status == SequenceEntityStatus.RUNNING && this.Status != SequenceEntityStatus.DISABLED) {
-                        Logger.Info("Next Target is above altitude - Interrupting current Instruction Set");
-                        await this.Parent.Interrupt();
-                    }
-                }
-            }
-        }
-
-        public double NextTargetAltitude { get => nextTargetAltitude; set { nextTargetAltitude = value; RaisePropertyChanged(); } }
-        public double NextTargetCurrentAltitude { get => nextTargetCurrentAltitude; set { nextTargetCurrentAltitude = value; RaisePropertyChanged(); } }
 
         public string NextTargetName { get => nextTargetName; set { nextTargetName = value; RaisePropertyChanged(); } }
-
-        [OnDeserialized]
-        public void OnDeserialized(StreamingContext context) {
-            RunWatchdogIfInsideSequenceRoot();
-        }
-
-        public override void AfterParentChanged() {
-            RunWatchdogIfInsideSequenceRoot();
-            Validate();
-        }
+                
 
         private LoopWhileNextTargetBelowHorizon(LoopWhileNextTargetBelowHorizon copyMe) : this(copyMe.profileService) { 
             CopyMetaData(copyMe);
-            NextTargetAltitude = copyMe.NextTargetAltitude;
-            AltitudeOffset = copyMe.AltitudeOffset;
         }
 
         public override object Clone() {
-            return new LoopWhileNextTargetBelowHorizon(this);
+            return new LoopWhileNextTargetBelowHorizon(this) {
+                Data = Data.Clone()
+            };
+        }
+        public override void AfterParentChanged() {
+            RunWatchdogIfInsideSequenceRoot();
+            Validate();
         }
 
         public bool Validate() {
@@ -95,50 +63,47 @@ namespace Orbuculum.Instructions {
             } else {
                 var nextTarget = Scry.NextTarget(this.Parent);
                 if(nextTarget == null) {
-                    NextTargetCurrentAltitude = double.NaN;
+                    Data.SetCoordinates(null);
+                    Data.CurrentAltitude = double.NaN;
                     NextTargetName = string.Empty;
                     i.Add("🚫 Scrying failed. No future target found");
                 } else {
-                    var altaz = CalculateAltAz(nextTarget);
-                    NextTargetCurrentAltitude = CalculateAltitude(altaz);
-                    NextTargetAltitude = CalculateHorizonAltitude(altaz);
-                    NextTargetName = nextTarget.Target.TargetName;                    
+                    Data.SetCoordinates(nextTarget.Target.InputCoordinates);
+                    NextTargetName = nextTarget.Target.TargetName;
                 }
             }
 
             Issues = i;
             return i.Count == 0;
         }
-        private TopocentricCoordinates CalculateAltAz(IDeepSkyObjectContainer target) {
-            var location = profileService.ActiveProfile.AstrometrySettings;
-            var altaz = target.Target.InputCoordinates
-                .Coordinates
-                .Transform(
-                    Angle.ByDegree(location.Latitude),
-                    Angle.ByDegree(location.Longitude));
 
-            return altaz;
-        }
-        private double CalculateAltitude(TopocentricCoordinates altaz) {
-            return Math.Round(altaz.Altitude.Degree, 2);
+
+        public override void CalculateExpectedTime() {
+            Data.CurrentAltitude = GetCurrentAltitude(DateTime.Now, Data.Observer);
+            ItemUtility.CalculateExpectedTimeCommon(Data, offset: 0, until: false, 90, GetCurrentAltitude);
         }
 
-        private double CalculateHorizonAltitude(TopocentricCoordinates altaz) {
-            var currentAz = Math.Round(altaz.Azimuth.Degree, 2);
-
-            var horizon = profileService.ActiveProfile.AstrometrySettings.Horizon;
-            var horizonAltitude = 0d;
-            if (horizon != null) {
-                horizonAltitude = horizon.GetAltitude(currentAz);
-            }
-            return Math.Round(Math.Max(-90, Math.Min(90, horizonAltitude + AltitudeOffset)), 2);
+        public double GetCurrentAltitude(DateTime time, ObserverInfo observer) {
+            TopocentricCoordinates altaz = Data.Coordinates.Coordinates.Transform(Angle.ByDegree(observer.Latitude), Angle.ByDegree(observer.Longitude), time);
+            return altaz.Altitude.Degree;
         }
 
         public override bool Check(ISequenceItem previousItem, ISequenceItem nextItem) {
-            return NextTargetCurrentAltitude < NextTargetAltitude;
+            CalculateExpectedTime();
+            return Data.CurrentAltitude < Data.TargetAltitude;
         }
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowHorizon)}, Next Target Horizon {NextTargetCurrentAltitude}, Next Target Current Hour Angle {NextTargetAltitude}";
+            return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowHorizon)}, Next Target Horizon {Data.TargetAltitude}, Next Target Current Altitude {Data.CurrentAltitude}";
         }
+
+
+
+        [Obsolete]
+        [JsonIgnore]
+        public double AltitudeOffset { get; set; }
+
+        [JsonProperty(propertyName: "AltitudeOffset")]
+        [Obsolete]
+        private double DeprecatedAltitudeOffset { set { Data.Offset = value; } }
     }
 }

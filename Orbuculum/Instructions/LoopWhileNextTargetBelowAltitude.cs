@@ -7,6 +7,7 @@ using NINA.Profile.Interfaces;
 using NINA.Sequencer.Conditions;
 using NINA.Sequencer.Container;
 using NINA.Sequencer.SequenceItem;
+using NINA.Sequencer.SequenceItem.Utility;
 using NINA.Sequencer.Utility;
 using NINA.Sequencer.Validations;
 using System;
@@ -25,57 +26,32 @@ namespace Orbuculum.Instructions {
     [ExportMetadata("Category", "Orbuculum")]
     [Export(typeof(ISequenceCondition))]
     [JsonObject(MemberSerialization.OptIn)]
-    public class LoopWhileNextTargetBelowAltitude : SequenceCondition, IValidatable {
-        private IList<string> issues = new List<string>();
+    public class LoopWhileNextTargetBelowAltitude : LoopForAltitudeBase, IValidatable {
         private string nextTargetName;
-        private double nextTargetAltitude;
-        private double nextTargetCurrentAltitude;
         private IProfileService profileService;
-
-        public IList<string> Issues { get => issues; set { issues = value; RaisePropertyChanged(); } }
+        
 
         [ImportingConstructor]
-        public LoopWhileNextTargetBelowAltitude(IProfileService profileService) {
+        public LoopWhileNextTargetBelowAltitude(IProfileService profileService): base(profileService, false) {
             this.profileService = profileService;
-            ConditionWatchdog = new ConditionWatchdog(InterruptWhenTargetBelowAltitude, TimeSpan.FromSeconds(5));
+            Data.Comparator = ComparisonOperatorEnum.GREATER_THAN;
 
         }
-
-        private async Task InterruptWhenTargetBelowAltitude() {
-            if (!Check(null, null)) {
-                if (this.Parent != null) {
-                    if (ItemUtility.IsInRootContainer(Parent) && this.Parent.Status == SequenceEntityStatus.RUNNING && this.Status != SequenceEntityStatus.DISABLED) {
-                        Logger.Info("Next Target is above altitude - Interrupting current Instruction Set");
-                        await this.Parent.Interrupt();
-                    }
-                }
-            }
-        }
-
-
-        [JsonProperty]
-        public double NextTargetAltitude { get => nextTargetAltitude; set { nextTargetAltitude = value; RaisePropertyChanged(); } }
-        public double NextTargetCurrentAltitude { get => nextTargetCurrentAltitude; set { nextTargetCurrentAltitude = value; RaisePropertyChanged(); } }
 
         public string NextTargetName { get => nextTargetName; set { nextTargetName = value; RaisePropertyChanged(); } }
 
-        [OnDeserialized]
-        public void OnDeserialized(StreamingContext context) {
-            RunWatchdogIfInsideSequenceRoot();
-        }
-
-        public override void AfterParentChanged() {
-            RunWatchdogIfInsideSequenceRoot();
-            Validate();
-        }
-
         private LoopWhileNextTargetBelowAltitude(LoopWhileNextTargetBelowAltitude copyMe) : this(copyMe.profileService) { 
             CopyMetaData(copyMe);
-            NextTargetAltitude = copyMe.NextTargetAltitude;
         }
 
         public override object Clone() {
-            return new LoopWhileNextTargetBelowAltitude(this);
+            return new LoopWhileNextTargetBelowAltitude(this) {
+                Data = Data.Clone()
+            };
+        }
+        public override void AfterParentChanged() {
+            RunWatchdogIfInsideSequenceRoot();
+            Validate();
         }
 
         public bool Validate() {
@@ -85,14 +61,15 @@ namespace Orbuculum.Instructions {
             } else {
                 var nextTarget = Scry.NextTarget(this.Parent);
                 if(nextTarget == null) {
-                    NextTargetCurrentAltitude = double.NaN;
+                    Data.SetCoordinates(null);
+                    Data.CurrentAltitude = double.NaN;
                     NextTargetName = string.Empty;
                     i.Add("🚫 Scrying failed. No future target found");
                 } else {
-                    NextTargetCurrentAltitude = CalculateAltitude(nextTarget);
+                    Data.SetCoordinates(nextTarget.Target.InputCoordinates);
                     NextTargetName = nextTarget.Target.TargetName;
 
-                    if (NextTargetAltitude > nextTarget.Target.DeepSkyObject.MaxAltitude.Y) {
+                    if (Data.TargetAltitude > nextTarget.Target.DeepSkyObject.MaxAltitude.Y) {
                         i.Add($"🚫 The next target will never reach the chosen altitude. Its max altitude is predicted to be {nextTarget.Target.DeepSkyObject.MaxAltitude.Y:#.##}°!");
                     }
                 }
@@ -102,24 +79,44 @@ namespace Orbuculum.Instructions {
             Issues = i;
             return i.Count == 0;
         }
-        private double CalculateAltitude(IDeepSkyObjectContainer target) {
-            var location = profileService.ActiveProfile.AstrometrySettings;
-            var altaz = target.Target.InputCoordinates
+
+        public double GetCurrentAltitude(DateTime time, ObserverInfo observer) {
+            observer.Longitude = profileService.ActiveProfile.AstrometrySettings.Longitude;
+            observer.Latitude = profileService.ActiveProfile.AstrometrySettings.Latitude;
+            
+            var altaz = Data.Coordinates
                 .Coordinates
                 .Transform(
-                    Angle.ByDegree(location.Latitude),
-                    Angle.ByDegree(location.Longitude));
+                    Angle.ByDegree(observer.Latitude),
+                    Angle.ByDegree(observer.Longitude),
+                    time);
 
-            return Math.Round(altaz.Altitude.Degree, 2);            
+            return Math.Round(altaz.Altitude.Degree, 2);
+        }
+
+        public override void CalculateExpectedTime() {
+            Data.CurrentAltitude = GetCurrentAltitude(DateTime.Now, Data.Observer);
+            ItemUtility.CalculateExpectedTimeCommon(Data, 0, until: true, 30, GetCurrentAltitude);
         }
 
         public override bool Check(ISequenceItem previousItem, ISequenceItem nextItem) {
-            return NextTargetCurrentAltitude < NextTargetAltitude;
+            CalculateExpectedTime();
+            return Data.CurrentAltitude < Data.TargetAltitude;
         }
+
+
         public override string ToString() {
-            return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowAltitude)}, Next Target Altitude {NextTargetCurrentAltitude}, Next Target Current Altitude {NextTargetAltitude}";
+            return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowAltitude)}, Next Target Altitude {Data.TargetAltitude}, Next Target Current Altitude {Data.CurrentAltitude}";
         }
 
 
+
+        [Obsolete]
+        [JsonIgnore]
+        public double NextTargetAltitude { get; set; }
+
+        [JsonProperty(propertyName: "NextTargetAltitude")]
+        [Obsolete]
+        private double DeprecatedNextTargetAltitude { set { Data.Offset = value; } }
     }
 }

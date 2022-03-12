@@ -26,6 +26,34 @@
     <converter:MinusOneToEmptyStringConverter x:Key="MinusOneToEmptyStringConverter" />
     <converter:NullToVisibilityCollapsedConverter x:Key="NullToVisibilityCollapsedConverter" />
 
+    <StackPanel
+        x:Key="WaitProgress"
+        x:Shared="false"
+        DataContext="{Binding Data}"
+        Orientation="Horizontal">
+        <TextBlock
+            Margin="5,0,0,0"
+            VerticalAlignment="Center"
+            Text="{ns:Loc LblAltitude}" />
+        <TextBlock
+            Margin="5,0,0,0"
+            VerticalAlignment="Center"
+            Text="{Binding CurrentAltitude}" />
+        <TextBlock VerticalAlignment="Center" Text="° " />
+        <TextBlock VerticalAlignment="Center" Text="{Binding RisingSettingDisplay}" />
+        <TextBlock VerticalAlignment="Center" Text=" " />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Comparator}" />
+        <TextBlock VerticalAlignment="Center" Text=" " />
+        <TextBlock VerticalAlignment="Center" Text="{Binding TargetAltitude}" />
+        <TextBlock VerticalAlignment="Center" Text="°" />
+        <TextBlock
+            Margin="8,0,0,0"
+            VerticalAlignment="Center"
+            Text="⏰" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Approximate}" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTime}" />
+    </StackPanel>
+
     <DataTemplate DataType="{x:Type local:LoopWhileNextTargetBelowAltitude}">
         <nina:SequenceBlockView>
             <nina:SequenceBlockView.SequenceItemContent>
@@ -37,7 +65,7 @@
                         VerticalAlignment="Center"
                         Unit="°">
                         <ninactrl:UnitTextBox.Text>
-                            <Binding Path="NextTargetAltitude" UpdateSourceTrigger="LostFocus">
+                            <Binding Path="Data.Offset" UpdateSourceTrigger="LostFocus">
                                 <Binding.ValidationRules>
                                     <rules:DoubleRangeRule>
                                         <rules:DoubleRangeRule.ValidRange>
@@ -51,12 +79,9 @@
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
             <nina:SequenceBlockView.SequenceItemProgressContent>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetAltitude, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Data.Offset, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentAltitude}" />
-                    <TextBlock Text="° / " />
-                    <TextBlock Text="{Binding NextTargetAltitude}" />
-                    <TextBlock Text="°" />
+                    <ContentPresenter Content="{StaticResource WaitProgress}" />
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemProgressContent>
         </nina:SequenceBlockView>
@@ -66,10 +91,12 @@
             <mini:MiniCondition.ConditionProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetAltitude, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentAltitude}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding Data.CurrentAltitude}" />
                     <TextBlock Text="° / " />
-                    <TextBlock Text="{Binding NextTargetAltitude}" />
-                    <TextBlock Text="°" />
+                    <TextBlock Text="{Binding Data.TargetAltitude}" />
+                    <TextBlock Text="° ⏰" />
+                    <TextBlock Text="{Binding Data.Approximate}" />
+                    <TextBlock Text="{Binding Data.ExpectedTime}" />
                 </StackPanel>
             </mini:MiniCondition.ConditionProgressContent>
         </mini:MiniCondition>
@@ -87,7 +114,7 @@
                         TextAlignment="Right"
                         Unit="°">
                         <ninactrl:UnitTextBox.Text>
-                            <Binding Path="AltitudeOffset">
+                            <Binding Path="Data.Offset">
                                 <Binding.ValidationRules>
                                     <rules:DoubleRangeRule>
                                         <rules:DoubleRangeRule.ValidRange>
@@ -103,10 +130,7 @@
             <nina:SequenceBlockView.SequenceItemProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetAltitude, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentAltitude}" />
-                    <TextBlock Text="° / " />
-                    <TextBlock Text="{Binding NextTargetAltitude}" />
-                    <TextBlock Text="°" />
+                    <ContentPresenter Content="{StaticResource WaitProgress}" />
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemProgressContent>
         </nina:SequenceBlockView>
@@ -116,10 +140,12 @@
             <mini:MiniCondition.ConditionProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetAltitude, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentAltitude}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding Data.CurrentAltitude}" />
                     <TextBlock Text="° / " />
-                    <TextBlock Text="{Binding NextTargetAltitude}" />
-                    <TextBlock Text="°" />
+                    <TextBlock Text="{Binding Data.TargetAltitude}" />
+                    <TextBlock Text="° ⏰" />
+                    <TextBlock Text="{Binding Data.Approximate}" />
+                    <TextBlock Text="{Binding Data.ExpectedTime}" />
                 </StackPanel>
             </mini:MiniCondition.ConditionProgressContent>
         </mini:MiniCondition>

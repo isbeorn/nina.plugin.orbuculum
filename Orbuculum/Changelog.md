@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.4.0
+- Show estimated time when altitude is reached
+
 ## Version 1.0.3.4
 - Properly consider disable status for orbuculum condition loops
 
