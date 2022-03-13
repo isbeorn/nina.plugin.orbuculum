@@ -62,11 +62,11 @@ namespace Orbuculum.Instructions {
                         if(Data.Coordinates != nextTarget.Target.InputCoordinates) {
                             Data.SetCoordinates(nextTarget.Target.InputCoordinates);
                             NextTargetName = nextTarget.Target.TargetName;
+                        }
 
-                            if (Data.TargetAltitude > nextTarget.Target.DeepSkyObject.MaxAltitude.Y) {
-                                i.Add($"🚫 The next target will never reach the chosen altitude. Its max altitude is predicted to be {nextTarget.Target.DeepSkyObject.MaxAltitude.Y:#.##}°!");
-                            }
-                        }                        
+                        if (Data.TargetAltitude > nextTarget.Target.DeepSkyObject.MaxAltitude.Y) {
+                            i.Add($"🚫 The next target will never reach the chosen altitude. Its max altitude is predicted to be {nextTarget.Target.DeepSkyObject.MaxAltitude.Y:#.##}°!");
+                        }
                     }
                 }
             }
