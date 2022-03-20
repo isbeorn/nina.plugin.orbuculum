@@ -98,7 +98,7 @@ namespace Orbuculum.Instructions {
 
         public override bool Check(ISequenceItem previousItem, ISequenceItem nextItem) {
             CalculateExpectedTime();
-            return Data.CurrentAltitude < Data.TargetAltitude;
+            return Data.CurrentAltitude < Data.GetTargetAltitudeWithHorizon(DateTime.Now);
         }
         public override string ToString() {
             return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowHorizon)}, Next Target Horizon {Data.TargetAltitude}, Next Target Current Altitude {Data.CurrentAltitude}";
