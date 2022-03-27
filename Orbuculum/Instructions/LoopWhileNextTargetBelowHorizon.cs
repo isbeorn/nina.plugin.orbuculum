@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
 using NINA.Astrometry;
 using NINA.Core.Enum;
-using NINA.Core.Model;
-using NINA.Core.Utility;
 using NINA.Profile.Interfaces;
 using NINA.Sequencer.Conditions;
-using NINA.Sequencer.Container;
 using NINA.Sequencer.SequenceItem;
 using NINA.Sequencer.SequenceItem.Utility;
 using NINA.Sequencer.Utility;
@@ -13,13 +10,9 @@ using NINA.Sequencer.Validations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Orbuculum.Instructions {
+
     [ExportMetadata("Name", "🔮 Loop While Next Target Is Below Horizon ")]
     [ExportMetadata("Description", "Searches the sequencer for the next target and loops the current set for as long as the altitude of next target is below the horizon.")]
     [ExportMetadata("Icon", "WaitForAltitudeSVG")]
@@ -30,19 +23,16 @@ namespace Orbuculum.Instructions {
         private string nextTargetName;
         private IProfileService profileService;
 
-
         [ImportingConstructor]
         public LoopWhileNextTargetBelowHorizon(IProfileService profileService) : base(profileService, true) {
             this.profileService = profileService;
             Data.Offset = 0;
             Data.Comparator = ComparisonOperatorEnum.LESS_THAN;
-
         }
 
         public string NextTargetName { get => nextTargetName; set { nextTargetName = value; RaisePropertyChanged(); } }
-                
 
-        private LoopWhileNextTargetBelowHorizon(LoopWhileNextTargetBelowHorizon copyMe) : this(copyMe.profileService) { 
+        private LoopWhileNextTargetBelowHorizon(LoopWhileNextTargetBelowHorizon copyMe) : this(copyMe.profileService) {
             CopyMetaData(copyMe);
         }
 
@@ -51,9 +41,9 @@ namespace Orbuculum.Instructions {
                 Data = Data.Clone()
             };
         }
+
         public override void AfterParentChanged() {
             RunWatchdogIfInsideSequenceRoot();
-            Validate();
         }
 
         public bool Validate() {
@@ -71,6 +61,8 @@ namespace Orbuculum.Instructions {
                     } else {
                         if (Data.Coordinates != nextTarget.Target.InputCoordinates) {
                             Data.SetCoordinates(nextTarget.Target.InputCoordinates);
+                        }
+                        if (nextTarget.Target.TargetName != NextTargetName) {
                             NextTargetName = nextTarget.Target.TargetName;
                         }
                     }
@@ -81,7 +73,6 @@ namespace Orbuculum.Instructions {
             return i.Count == 0;
         }
 
-
         public override void CalculateExpectedTime() {
             if (Data.Coordinates == null) return;
 
@@ -91,20 +82,20 @@ namespace Orbuculum.Instructions {
 
         public double GetCurrentAltitude(DateTime time, ObserverInfo observer) {
             if (Data.Coordinates == null) return double.NaN;
-            
+
             TopocentricCoordinates altaz = Data.Coordinates.Coordinates.Transform(Angle.ByDegree(observer.Latitude), Angle.ByDegree(observer.Longitude), time);
             return altaz.Altitude.Degree;
         }
 
         public override bool Check(ISequenceItem previousItem, ISequenceItem nextItem) {
             CalculateExpectedTime();
+            if (double.IsNaN(Data.CurrentAltitude)) { return true; }
             return Data.CurrentAltitude < Data.GetTargetAltitudeWithHorizon(DateTime.Now);
         }
+
         public override string ToString() {
             return $"Category: {Category}, Item: {nameof(LoopWhileNextTargetBelowHorizon)}, Next Target Horizon {Data.TargetAltitude}, Next Target Current Altitude {Data.CurrentAltitude}";
         }
-
-
 
         [Obsolete]
         [JsonIgnore]

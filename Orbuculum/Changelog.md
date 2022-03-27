@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## Version 1.0.4.2
+- Prevent deadlock when using orbitals sequences as next target
+- Set next target name properly when it is changed
+
 ## Version 1.0.4.0
 - Show estimated time when altitude is reached
 

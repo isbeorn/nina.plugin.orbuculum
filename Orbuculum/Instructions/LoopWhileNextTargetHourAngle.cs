@@ -79,7 +79,6 @@ namespace Orbuculum.Instructions {
 
         public override void AfterParentChanged() {
             RunWatchdogIfInsideSequenceRoot();
-            Validate();
         }
 
         private LoopWhileNextTargetHourAngle(LoopWhileNextTargetHourAngle copyMe) : this(copyMe.profileService) {
@@ -105,7 +104,9 @@ namespace Orbuculum.Instructions {
                         i.Add("🚫 Scrying failed. No future target found");
                     } else {
                         NextTargetCurrentHourAngle = CalculateHourAngle(nextTarget);
-                        NextTargetName = nextTarget.Target.TargetName;
+                        if (nextTarget.Target.TargetName != NextTargetName) {
+                            NextTargetName = nextTarget.Target.TargetName;
+                        }
                     }
                 }
             }

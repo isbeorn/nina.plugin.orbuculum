@@ -77,7 +77,6 @@ namespace Orbuculum.Instructions {
 
         public override void AfterParentChanged() {
             RunWatchdogIfInsideSequenceRoot();
-            Validate();
         }
 
         private LoopWhileHourAngle(LoopWhileHourAngle copyMe) : this(copyMe.profileService) {

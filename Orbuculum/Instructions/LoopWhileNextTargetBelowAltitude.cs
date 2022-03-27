@@ -42,8 +42,7 @@ namespace Orbuculum.Instructions {
         }
 
         public override void AfterParentChanged() {
-            RunWatchdogIfInsideSequenceRoot();
-            Validate();
+            RunWatchdogIfInsideSequenceRoot();            
         }
 
         public bool Validate() {
@@ -61,6 +60,8 @@ namespace Orbuculum.Instructions {
                     } else {
                         if(Data.Coordinates != nextTarget.Target.InputCoordinates) {
                             Data.SetCoordinates(nextTarget.Target.InputCoordinates);
+                        }
+                        if(nextTarget.Target.TargetName != NextTargetName) {
                             NextTargetName = nextTarget.Target.TargetName;
                         }
 
