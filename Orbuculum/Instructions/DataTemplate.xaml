@@ -25,6 +25,7 @@
     <converter:CameraDefaultValueConverter x:Key="CameraDefaultValueConverter" />
     <converter:MinusOneToEmptyStringConverter x:Key="MinusOneToEmptyStringConverter" />
     <converter:NullToVisibilityCollapsedConverter x:Key="NullToVisibilityCollapsedConverter" />
+    <converter:NaNToDoubleDashConverter x:Key="NaNToDoubleDashConverter" />
 
     <StackPanel
         x:Key="WaitProgress"
@@ -38,7 +39,7 @@
         <TextBlock
             Margin="5,0,0,0"
             VerticalAlignment="Center"
-            Text="{Binding CurrentAltitude}" />
+            Text="{Binding CurrentAltitude, Converter={StaticResource NaNToDoubleDashConverter}}" />
         <TextBlock VerticalAlignment="Center" Text="° " />
         <TextBlock VerticalAlignment="Center" Text="{Binding RisingSettingDisplay}" />
         <TextBlock VerticalAlignment="Center" Text=" " />
@@ -91,7 +92,7 @@
             <mini:MiniCondition.ConditionProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetAltitude, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding Data.CurrentAltitude}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding Data.CurrentAltitude, Converter={StaticResource NaNToDoubleDashConverter}}" />
                     <TextBlock Text="° / " />
                     <TextBlock Text="{Binding Data.TargetAltitude}" />
                     <TextBlock Text="° ⏰" />
@@ -140,7 +141,7 @@
             <mini:MiniCondition.ConditionProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetAltitude, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding Data.CurrentAltitude}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding Data.CurrentAltitude, Converter={StaticResource NaNToDoubleDashConverter}}" />
                     <TextBlock Text="° / " />
                     <TextBlock Text="{Binding Data.TargetAltitude}" />
                     <TextBlock Text="° ⏰" />
@@ -183,7 +184,7 @@
             <nina:SequenceBlockView.SequenceItemProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetHourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentHourAngle}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentHourAngle, Converter={StaticResource NaNToDoubleDashConverter}}" />
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding NextTargetHourAngle}" />
                     <TextBlock Text="h" />
@@ -196,7 +197,7 @@
             <mini:MiniCondition.ConditionProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding NextTargetHourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
                     <TextBlock Text="{Binding NextTargetName}" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentHourAngle}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding NextTargetCurrentHourAngle, Converter={StaticResource NaNToDoubleDashConverter}}" />
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding NextTargetHourAngle}" />
                     <TextBlock Text="h" />
@@ -236,7 +237,7 @@
             </nina:SequenceBlockView.SequenceItemContent>
             <nina:SequenceBlockView.SequenceItemProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding HourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
-                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle, Converter={StaticResource NaNToDoubleDashConverter}}" />
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding HourAngle}" />
                     <TextBlock Text="h" />
@@ -248,7 +249,7 @@
         <mini:MiniCondition>
             <mini:MiniCondition.ConditionProgressContent>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding HourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
-                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle}" />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle, Converter={StaticResource NaNToDoubleDashConverter}}" />
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding HourAngle}" />
                     <TextBlock Text="h" />

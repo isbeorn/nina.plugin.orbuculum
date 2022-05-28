@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## Version 1.0.4.3
+- Prevent unhandled exception when using "Loop while hour angle" without a target available
+- Show double dashes instead of "NaN" when not target is available
+
 ## Version 1.0.4.2
 - Prevent deadlock when using orbitals sequences as next target
 - Set next target name properly when it is changed
