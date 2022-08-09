@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Orbuculum.Instructions {
-    internal class Scry {
+    public class Scry {
         public static IDeepSkyObjectContainer NextTarget(ISequenceContainer container) {
             if (container != null && container.Parent != null) {
 
