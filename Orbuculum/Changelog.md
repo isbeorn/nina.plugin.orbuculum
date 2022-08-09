@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.5.0
+- Add "Wait for Hour Angle" instruction
+
 ## Version 1.0.4.3
 - Prevent unhandled exception when using "Loop while hour angle" without a target available
 - Show double dashes instead of "NaN" when not target is available

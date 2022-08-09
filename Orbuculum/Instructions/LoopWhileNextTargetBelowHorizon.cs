@@ -47,7 +47,7 @@ namespace Orbuculum.Instructions {
         }
 
         public bool Validate() {
-            var i = new List<string>(); Issues = i;
+            var i = new List<string>();
             if (this.Parent == null) {
                 i.Add("🚫 The condition has to be inside an instruction set.");
             } else {

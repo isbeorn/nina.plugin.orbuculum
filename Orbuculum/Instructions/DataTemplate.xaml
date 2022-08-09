@@ -259,6 +259,60 @@
     </DataTemplate>
 
 
+
+    <DataTemplate DataType="{x:Type local:WaitForHourAngle}">
+        <nina:SequenceBlockView>
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Hour Angle" />
+
+                    <ComboBox
+                        Margin="5,0,0,0"
+                        ItemsSource="{Binding ComparisonOperators}"
+                        SelectedValue="{Binding Comparator}" />
+
+                    <ninactrl:UnitTextBox
+                        MinWidth="35"
+                        VerticalAlignment="Center"
+                        Unit="h">
+                        <ninactrl:UnitTextBox.Text>
+                            <Binding Path="HourAngle" UpdateSourceTrigger="LostFocus">
+                                <Binding.ValidationRules>
+                                    <rules:DoubleRangeRule>
+                                        <rules:DoubleRangeRule.ValidRange>
+                                            <rules:DoubleRangeChecker Maximum="12" Minimum="-12" />
+                                        </rules:DoubleRangeRule.ValidRange>
+                                    </rules:DoubleRangeRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ninactrl:UnitTextBox.Text>
+                    </ninactrl:UnitTextBox>
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+            <nina:SequenceBlockView.SequenceItemProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding HourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle, Converter={StaticResource NaNToDoubleDashConverter}}" />
+                    <TextBlock Text="h / " />
+                    <TextBlock Text="{Binding HourAngle}" />
+                    <TextBlock Text="h" />
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemProgressContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+    <DataTemplate x:Key="Orbuculum.Instructions.WaitForHourAngle_Mini">
+        <mini:MiniCondition>
+            <mini:MiniCondition.ConditionProgressContent>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding HourAngle, Converter={StaticResource NaNToVisibilityCollapsedConverter}}">
+                    <TextBlock Margin="5,0,0,0" Text="{Binding CurrentHourAngle, Converter={StaticResource NaNToDoubleDashConverter}}" />
+                    <TextBlock Text="h / " />
+                    <TextBlock Text="{Binding HourAngle}" />
+                    <TextBlock Text="h" />
+                </StackPanel>
+            </mini:MiniCondition.ConditionProgressContent>
+        </mini:MiniCondition>
+    </DataTemplate>
+
+
     <DataTemplate DataType="{x:Type local:AutoBalancingExposure}">
         <nina:SequenceBlockView>
             <nina:SequenceBlockView.SequenceItemContent>

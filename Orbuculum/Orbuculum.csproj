@@ -275,6 +275,7 @@
     <Compile Include="Instructions\LoopWhileNextTargetBelowAltitude.cs" />
     <Compile Include="Instructions\LoopWhileNextTargetHourAngle.cs" />
     <Compile Include="Instructions\Scry.cs" />
+    <Compile Include="Instructions\WaitForHourAngle.cs" />
     <Compile Include="Options.xaml.cs">
       <DependentUpon>Options.xaml</DependentUpon>
     </Compile>
