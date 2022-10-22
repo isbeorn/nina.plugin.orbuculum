@@ -28,6 +28,7 @@ namespace Orbuculum.Instructions {
         private string nextTargetName;
         private double nextTargetHourAngle;
         private double nextTargetCurrentHourAngle;
+        private string expectedTimeStr = "";
         private IProfileService profileService;
         private ComparisonOperatorEnum comparator;
 
@@ -67,10 +68,36 @@ namespace Orbuculum.Instructions {
         }
 
         [JsonProperty]
-        public double NextTargetHourAngle { get => nextTargetHourAngle; set { nextTargetHourAngle = value; RaisePropertyChanged(); } }
-        public double NextTargetCurrentHourAngle { get => nextTargetCurrentHourAngle; set { nextTargetCurrentHourAngle = value; RaisePropertyChanged(); } }
+        public double NextTargetHourAngle {
+            get => nextTargetHourAngle;
+            set {
+                nextTargetHourAngle = value;
+                RaisePropertyChanged();
+                CalculateExpectedTime();
+            }
+        }
+        public double NextTargetCurrentHourAngle {
+            get => nextTargetCurrentHourAngle;
+            set {
+                nextTargetCurrentHourAngle = value;
+                RaisePropertyChanged();
+                CalculateExpectedTime();
+            }
+        }
 
         public string NextTargetName { get => nextTargetName; set { nextTargetName = value; RaisePropertyChanged(); } }
+        public string ExpectedTimeStr { get => expectedTimeStr; set { expectedTimeStr = value; RaisePropertyChanged(); } }
+        private void CalculateExpectedTime()
+        {
+            var now = DateTime.Now;
+            double SIDEREAL_HRS_PER_HOUR = AstroUtil.SIDEREAL_RATE_ARCSECONDS_PER_SECOND /* 15.041 */ * 24.0 / 360.0;
+            var siderealHoursDiff = (NextTargetHourAngle - NextTargetCurrentHourAngle) % 24;
+            if (!double.IsNaN(siderealHoursDiff))
+            {
+                var approximateDateTime = now.AddHours(siderealHoursDiff / SIDEREAL_HRS_PER_HOUR);
+                ExpectedTimeStr = approximateDateTime.ToString("HH:mm");
+            }
+        }
 
         [OnDeserialized]
         public void OnDeserialized(StreamingContext context) {
