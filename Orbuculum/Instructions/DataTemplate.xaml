@@ -188,6 +188,14 @@
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding NextTargetHourAngle}" />
                     <TextBlock Text="h" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Text="≈" Margin="8,0,0,0" />
+                        <TextBlock
+                            Margin="8,0,2,0"
+                            VerticalAlignment="Center"
+                            Text="⏰" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTimeStr}" />
+                    </StackPanel>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemProgressContent>
         </nina:SequenceBlockView>
@@ -201,6 +209,12 @@
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding NextTargetHourAngle}" />
                     <TextBlock Text="h" />
+                    <TextBlock VerticalAlignment="Center" Text="≈" Margin="2,0,0,0" />
+                    <TextBlock
+                        Margin="2,0,2,0"
+                        VerticalAlignment="Center"
+                        Text="⏰" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTimeStr}" />
                 </StackPanel>
             </mini:MiniCondition.ConditionProgressContent>
         </mini:MiniCondition>
@@ -241,6 +255,14 @@
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding HourAngle}" />
                     <TextBlock Text="h" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Text="≈" Margin="8,0,0,0" />
+                        <TextBlock
+                            Margin="8,0,2,0"
+                            VerticalAlignment="Center"
+                            Text="⏰" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTimeStr}" />
+                    </StackPanel>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemProgressContent>
         </nina:SequenceBlockView>
@@ -253,6 +275,12 @@
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding HourAngle}" />
                     <TextBlock Text="h" />
+                    <TextBlock VerticalAlignment="Center" Text="≈" Margin="2,0,0,0" />
+                    <TextBlock
+                         Margin="2,0,0,0"
+                         VerticalAlignment="Center"
+                         Text="⏰" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTimeStr}" />
                 </StackPanel>
             </mini:MiniCondition.ConditionProgressContent>
         </mini:MiniCondition>
@@ -295,6 +323,14 @@
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding HourAngle}" />
                     <TextBlock Text="h" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Text="≈" Margin="8,0,0,0" />
+                        <TextBlock
+                            Margin="8,0,2,0"
+                            VerticalAlignment="Center"
+                            Text="⏰" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTimeStr}" />
+                    </StackPanel>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemProgressContent>
         </nina:SequenceBlockView>
@@ -307,6 +343,12 @@
                     <TextBlock Text="h / " />
                     <TextBlock Text="{Binding HourAngle}" />
                     <TextBlock Text="h" />
+                    <TextBlock VerticalAlignment="Center" Text="≈" Margin="2,0,0,0" />
+                    <TextBlock
+                         Margin="2,0,0,0"
+                         VerticalAlignment="Center"
+                         Text="⏰" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding ExpectedTimeStr}" />
                 </StackPanel>
             </mini:MiniCondition.ConditionProgressContent>
         </mini:MiniCondition>

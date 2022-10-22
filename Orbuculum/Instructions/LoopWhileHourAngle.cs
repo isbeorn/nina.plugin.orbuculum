@@ -27,6 +27,7 @@ namespace Orbuculum.Instructions {
         private IList<string> issues = new List<string>();        
         private double hourAngle;
         private double currentHourAngle;
+        private string expectedTimeStr;
         private IProfileService profileService;
         private ComparisonOperatorEnum comparator;
 
@@ -66,9 +67,34 @@ namespace Orbuculum.Instructions {
         }
 
         [JsonProperty]
-        public double HourAngle { get => hourAngle; set { hourAngle = value; RaisePropertyChanged(); } }
-        public double CurrentHourAngle { get => currentHourAngle; set { currentHourAngle = value; RaisePropertyChanged(); } }
-
+        public double HourAngle {
+            get => hourAngle;
+            set {
+                hourAngle = value;
+                RaisePropertyChanged();
+                CalculateExpectedTime();
+            }
+        }
+        public double CurrentHourAngle { 
+            get => currentHourAngle;
+            set {
+                currentHourAngle = value;
+                RaisePropertyChanged();
+                CalculateExpectedTime();
+            }
+        }
+        public string ExpectedTimeStr { get => expectedTimeStr; set { expectedTimeStr = value; RaisePropertyChanged(); } }
+        private void CalculateExpectedTime()
+        {
+            var now = DateTime.Now;
+            double SIDEREAL_HRS_PER_HOUR = AstroUtil.SIDEREAL_RATE_ARCSECONDS_PER_SECOND /* 15.041 */ * 24.0 / 360.0;
+            var siderealHoursDiff = (HourAngle - CurrentHourAngle) % 24;
+            if (!double.IsNaN(siderealHoursDiff))
+            {
+                var approximateDateTime = now.AddHours(siderealHoursDiff / SIDEREAL_HRS_PER_HOUR);
+                ExpectedTimeStr = approximateDateTime.ToString("HH:mm");
+            }
+        }
 
         [OnDeserialized]
         public void OnDeserialized(StreamingContext context) {
