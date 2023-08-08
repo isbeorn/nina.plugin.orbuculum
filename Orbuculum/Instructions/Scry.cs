@@ -18,7 +18,7 @@ namespace Orbuculum.Instructions {
                 if (idx < snapshot.Count) {
                     for (var i = idx; i < snapshot.Count; i++) {
                         var item = snapshot[i];
-                        if (item is IDeepSkyObjectContainer target) {
+                        if (item is IDeepSkyObjectContainer target && target.Status != NINA.Core.Enum.SequenceEntityStatus.DISABLED) {
                             return target;
                         } else if (item is ISequenceContainer subcontainer) {
                             var downTarget = LookForTargetDownwards(subcontainer);
@@ -41,8 +41,8 @@ namespace Orbuculum.Instructions {
             var children = (IList<ISequenceItem>)container.GetItemsSnapshot();
             if(children != null) { 
                 foreach (var child in children) {
-                    if (child is IDeepSkyObjectContainer skyObjectContainer2) {
-                        return skyObjectContainer2;
+                    if (child is IDeepSkyObjectContainer skyObjectContainer && skyObjectContainer.Status != NINA.Core.Enum.SequenceEntityStatus.DISABLED) {
+                        return skyObjectContainer;
                     } else if (child is ISequenceContainer childContainer) {
                         var check = LookForTargetDownwards(childContainer);
                         if (check != null) {
