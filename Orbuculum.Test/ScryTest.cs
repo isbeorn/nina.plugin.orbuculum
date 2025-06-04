@@ -79,11 +79,20 @@ namespace Orbuculum.Test {
             var current = new Mock<ISequenceContainer>();
             current.SetupGet(x => x.Parent).Returns(parent.Object);
 
+            var disabled = new Mock<IDeepSkyObjectContainer>();
+            disabled.Setup(x => x.Parent).Returns(parent.Object);
+            disabled.SetupGet(x => x.Status).Returns(NINA.Core.Enum.SequenceEntityStatus.DISABLED);
+
             var next = new Mock<IDeepSkyObjectContainer>();
             next.Setup(x => x.Parent).Returns(parent.Object);
 
 
-            parent.Setup(x => x.GetItemsSnapshot()).Returns(new List<ISequenceItem>() { current.Object, new Mock<ISequenceContainer>().Object, new Mock<ISequenceItem>().Object, next.Object });
+            parent.Setup(x => x.GetItemsSnapshot()).Returns(new List<ISequenceItem>() { 
+                current.Object, 
+                new Mock<ISequenceContainer>().Object, 
+                new Mock<ISequenceItem>().Object, 
+                disabled.Object,
+                next.Object });
 
 
             var sut = Scry.NextTarget(current.Object);
@@ -122,12 +131,27 @@ namespace Orbuculum.Test {
             var current = new Mock<ISequenceContainer>();
             current.SetupGet(x => x.Parent).Returns(parent.Object);
 
+
+            var disabled = new Mock<IDeepSkyObjectContainer>();
+            disabled.Setup(x => x.Parent).Returns(parent.Object);
+            disabled.SetupGet(x => x.Status).Returns(NINA.Core.Enum.SequenceEntityStatus.DISABLED);
+
             var next = new Mock<IDeepSkyObjectContainer>();
             next.Setup(x => x.Parent).Returns(parent.Object);
 
 
-            parent.Setup(x => x.GetItemsSnapshot()).Returns(new List<ISequenceItem>() { current.Object, new Mock<ISequenceContainer>().Object, new Mock<ISequenceItem>().Object, next.Object });
-            root.Setup(x => x.GetItemsSnapshot()).Returns(new List<ISequenceItem>() { parent.Object, new Mock<ISequenceContainer>().Object, new Mock<ISequenceItem>().Object, next.Object });
+            parent.Setup(x => x.GetItemsSnapshot()).Returns(new List<ISequenceItem>() { 
+                current.Object,
+                new Mock<ISequenceContainer>().Object,
+                disabled.Object,
+                new Mock<ISequenceItem>().Object,
+                next.Object });
+            root.Setup(x => x.GetItemsSnapshot()).Returns(new List<ISequenceItem>() { 
+                parent.Object, 
+                new Mock<ISequenceContainer>().Object,
+                disabled.Object,
+                new Mock<ISequenceItem>().Object, 
+                next.Object });
 
 
             var sut = Scry.NextTarget(current.Object);

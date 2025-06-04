@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## Version 2.0.0.1
+- Disabled targets are now ignored for instructions that look up the next target
+
+## Version 2.0.0.0
+- Upgrade to .NET7
+
 ## Version 1.0.5.0
 - Add "Wait for Hour Angle" instruction
 
